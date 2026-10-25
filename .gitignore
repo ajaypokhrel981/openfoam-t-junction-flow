@@ -1,0 +1,17 @@
+# Generated case outputs (keep initial conditions)
+/case/[1-9]*/
+/case/0.[0-9]*/
+/case/processor*/
+/case/constant/polyMesh/
+/case/constant/extendedFeatureEdgeMesh/
+/case/constant/triSurface/*.eMesh
+/case/constant/triSurface/*.obj
+/case/postProcessing/
+/case/VTK/
+/case/log.*
+/case/*.foam
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*Zone.Identifier*

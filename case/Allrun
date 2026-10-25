@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+: "${WM_PROJECT_DIR:?Load the OpenFOAM v2412 environment first}"
+if [ -d constant/polyMesh ] || [ -f log.simpleFoam ]; then
+    echo "Existing run detected. Use sh Allclean --yes to reset this case first." >&2
+    exit 1
+fi
+run() {
+    app="$1"; shift
+    echo "Running $app (see log.$app)"
+    "$app" "$@" > "log.$app" 2>&1 || { tail -n 40 "log.$app"; exit 1; }
+}
+run surfaceFeatureExtract
+run blockMesh
+run snappyHexMesh -overwrite
+run checkMesh
+grep -q 'Mesh OK' log.checkMesh || { echo "Mesh quality check failed; inspect log.checkMesh." >&2; exit 1; }
+run simpleFoam
+echo "Run complete. Inspect residuals and conservation before interpreting results."

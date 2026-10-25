@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+if [ "${1:-}" != "--yes" ]; then
+    echo "Usage: sh Allclean --yes"
+    echo "Removes generated mesh, logs and nonzero time directories in this case."
+    exit 1
+fi
+test -f system/controlDict && test -f constant/triSurface/pipe.stl
+rm -rf -- constant/polyMesh constant/extendedFeatureEdgeMesh postProcessing VTK
+rm -f -- log.* ./*.foam constant/triSurface/*.eMesh constant/triSurface/*.obj
+for item in ./*; do
+    test -d "$item" || continue
+    name=${item#./}
+    case "$name" in
+        0|0.orig) continue ;;
+        processor[0-9]*|processors[0-9]*) rm -rf -- "$item" ;;
+        *) if printf '%s\n' "$name" | grep -Eq '^[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?$'; then rm -rf -- "$item"; fi ;;
+    esac
+done
+echo "Generated files removed; geometry and initial conditions retained."
